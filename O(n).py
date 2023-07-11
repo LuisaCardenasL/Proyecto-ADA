@@ -32,15 +32,14 @@ def espectaculo_zoologico(n, m, k, animales, grandezas, apertura, partes):
         
         return sorted_escenas
     
-    # Ordenar las escenas en la apertura según la grandeza total y la grandeza del animal
-    apertura_ordenada = sorted(apertura, key=lambda escena: (sum(grandezas[animales.index(animal)] for animal in escena), [grandezas[animales.index(animal)] for animal in escena]))
-    apertura_ordenada = ordenar_escenas_por_grandeza(apertura_ordenada)
+    # Ordenar las escenas en la apertura según la grandeza total y la grandeza del animal utilizando counting sort
+    apertura_ordenada = ordenar_escenas_por_grandeza(apertura)
     
-    # Ordenar las partes siguientes según la grandeza total y la grandeza del animal
+    # Ordenar las partes siguientes según la grandeza total y la grandeza del animal utilizando counting sort
     partes_ordenadas = []
     for parte in partes:
-        parte_ordenada = sorted(parte, key=lambda escena: (sum(grandezas[animales.index(animal)] for animal in escena), [grandezas[animales.index(animal)] for animal in escena]))
-        partes_ordenadas.append(ordenar_escenas_por_grandeza(parte_ordenada))
+        parte_ordenada = ordenar_escenas_por_grandeza(parte)
+        partes_ordenadas.append(parte_ordenada)
     
     # Encontrar el animal que participa en más escenas
     participacion_animales = {}
