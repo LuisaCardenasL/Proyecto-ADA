@@ -66,8 +66,8 @@ def espectaculo_zoologico(n, m, k, animales, grandezas, apertura, partes):
     print("El promedio de grandeza de todo el espectáculo fue de", promedio_grandezas)
 
 # Ejemplo de uso
-animales = ["ciempies", "libelula", "gato", "perro", "tapir", "nutria"]
-grandezas = [1, 2, 3, 4, 5, 6]
+animales = ["gato", "libelula", "ciempies", "nutria", "perro", "tapir"]
+grandezas = [3, 2, 1, 6, 4, 5]
 apertura = [["gato", "ciempies", "libelula"], ["ciempies", "tapir", "gato"], ["tapir", "perro", "gato"], ["tapir", "nutria", "perro"]]
 partes = [[["ciempies", "tapir", "gato"], ["tapir", "nutria", "perro"]], [["gato", "ciempies", "libelula"], ["tapir", "perro", "gato"]]]
 
