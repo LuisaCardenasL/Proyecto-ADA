@@ -1,75 +1,74 @@
-def zoo_show(n, m, k, animals, scenes):
-    apertura = []
-    partes = []
+def espectaculo_zoologico(n, m, k, animales, grandezas, apertura, partes):
+    animales_grandezas = list(zip(animales, grandezas))
 
-    for i in range(m):
-        apertura.append(scenes[i])
+    def ordenar_escenas(escenas):
+        for i in range(1, len(escenas)):
+            j = i
+            while j > 0 and comparar_escenas(escenas[j - 1], escenas[j]):
+                escenas[j - 1], escenas[j] = escenas[j], escenas[j - 1]
+                j -= 1
+        return escenas
 
-    for i in range(m, m + k):
-        partes.append(scenes[i])
+    def comparar_escenas(escena1, escena2):
+        grandeza_total1 = sum(grandezas[animales.index(animal)] for animal in escena1)
+        grandeza_total2 = sum(grandezas[animales.index(animal)] for animal in escena2)
+        return grandeza_total1 > grandeza_total2 or (grandeza_total1 == grandeza_total2 and escena1 > escena2)
 
-    animal_counts = {}
-    total_grandeur = 0
+    def ordenar_escenas_por_grandeza(escenas):
+        for escena in escenas:
+            for i in range(1, len(escena)):
+                j = i
+                while j > 0 and grandezas[animales.index(escena[j - 1])] > grandezas[animales.index(escena[j])]:
+                    escena[j - 1], escena[j] = escena[j], escena[j - 1]
+                    j -= 1
+        return escenas
 
-    for animal in animals:
-        animal_counts[animal[0]] = 0
+    # Ordenar las escenas en la apertura según la grandeza total y la grandeza del animal utilizando inserción
+    apertura_ordenada = ordenar_escenas(apertura)
+    apertura_ordenada = ordenar_escenas_por_grandeza(apertura_ordenada)
 
-    for scene in apertura:
-        total_grandeur += sum([animal[1] for animal in scene])
-        for animal in scene:
-            animal_counts[animal[0]] += 1
+    # Ordenar las partes siguientes según la grandeza total y la grandeza del animal utilizando inserción
+    partes_ordenadas = []
+    for parte in partes:
+        parte_ordenada = ordenar_escenas(parte)
+        partes_ordenadas.append(ordenar_escenas_por_grandeza(parte_ordenada))
 
-    for part in partes:
-        total_grandeur += sum([animal[1] for animal in part])
+    # Encontrar el animal que participa en más escenas
+    participacion_animales = {}
+    for parte in [apertura] + partes:
+        for escena in parte:
+            for animal in escena:
+                if animal in participacion_animales:
+                    participacion_animales[animal] += 1
+                else:
+                    participacion_animales[animal] = 1
 
-    average_grandeur = total_grandeur / (len(apertura) + len(partes))
+    max_participacion = max(participacion_animales.values())
+    animales_max_participacion = [animal for animal, participacion in participacion_animales.items() if participacion == max_participacion]
 
-    max_participation = max(animal_counts.values())
-    min_participation = min(animal_counts.values())
+     # Encontrar el animal que participa en menos escenas
+    min_participacion = min(participacion_animales.values())
+    animales_min_participacion = [animal for animal, participacion in participacion_animales.items() if participacion == min_participacion]
+    
+    # Calcular el promedio de las grandezas de todas las escenas
+    suma_total_grandezas = sum(grandezas)
+    promedio_grandezas = suma_total_grandezas / (m * k)
 
-    most_participated_animals = [animal for animal, count in animal_counts.items() if count == max_participation]
-    least_participated_animals = [animal for animal, count in animal_counts.items() if count == min_participation]
-
-    scenes_apertura = ", ".join([str(scene) for scene in apertura])
-    scenes_partes = [", ".join([str(scene) for scene in part]) for part in partes]
-
-    print("Apertura: ", scenes_apertura)
-    print("Parte 1: ", scenes_partes[0])
-    print("Parte 2: ", scenes_partes[1])
-    print("Parte 3: ", scenes_partes[2])
-    print("El animal que participó en más escenas dentro del espectáculo fue: ", most_participated_animals, "que participó en", max_participation, "escenas.")
-    print("El animal que menos participó en escenas dentro del espectáculo fueron: ", least_participated_animals, "que participó en", min_participation, "escenas.")
-    print("La escena de menor grandeza total fue la escena", min(apertura + partes, key=lambda x: sum([animal[1] for animal in x])))
-    print("La escena de mayor grandeza total fue la escena", max(apertura + partes, key=lambda x: sum([animal[1] for animal in x])))
-    print("El promedio de grandeza de todo el espectáculo fue de", round(average_grandeur, 2))
+    # Imprimir la información obtenida
+    print("El orden en el que se debe presentar el espectáculo es:")
+    print("apertura =", apertura_ordenada)
+    for i, parte in enumerate(partes_ordenadas, start=1):
+        print("parte{} =".format(i), parte)
+    print("El animal que participó en más escenas dentro del espectáculo fue", animales_max_participacion, "con", max_participacion, "escenas.")
+    print("El animal que participó en menos escenas dentro del espectáculo fue", animales_min_participacion, "con", min_participacion, "escenas.")
+    print("La escena de menor grandeza total fue la escena", apertura_ordenada[0])
+    print("La escena de mayor grandeza total fue la escena", apertura_ordenada[-1])
+    print("El promedio de grandeza de todo el espectáculo fue de", promedio_grandezas)
 
 # Ejemplo de uso
-n = 9
-m = 4
-k = 3
+animales = ["ciempies", "libelula", "gato", "perro", "tapir", "nutria"]
+grandezas = [1, 2, 3, 4, 5, 6]
+apertura = [["gato", "ciempies", "libelula"], ["ciempies", "tapir", "gato"], ["tapir", "perro", "gato"], ["tapir", "nutria", "perro"]]
+partes = [[["ciempies", "tapir", "gato"], ["tapir", "nutria", "perro"]], [["gato", "ciempies", "libelula"], ["tapir", "perro", "gato"]]]
 
-animals = [
-    ("Capibara", 1),
-    ("Loro", 2),
-    ("Caiman", 3),
-    ("Boa", 4),
-    ("Cocodrilo", 5),
-    ("Cebra", 6),
-    ("Pantera negra", 7),
-    ("Tigre", 8),
-    ("León", 9)
-]
-
-scenes = [
-    [("Caiman", 3), ("Capibara", 1), ("Loro", 2)],
-    [("Boa", 4), ("Caiman", 3), ("Capibara", 1)],
-    [("Cocodrilo", 5), ("Capibara", 1), ("Loro", 2)],
-    [("Pantera negra", 7), ("Cocodrilo", 5), ("Loro", 2)],
-    [("Tigre", 8), ("Loro", 2), ("Capibara", 1)],
-    [("Leon", 9), ("Caiman", 3), ("Loro", 2)],
-    [("León", 9), ("Cocodrilo", 5), ("Boa", 4)],
-    [("León", 9), ("Pantera negra", 7), ("Cebra", 6)],
-    [("Tigre", 8), ("Cebra", 6), ("Pantera negra", 7)]
-]
-
-zoo_show(n, m, k, animals, scenes)
+espectaculo_zoologico(len(animales), 3, 2, animales, grandezas, apertura, partes)
