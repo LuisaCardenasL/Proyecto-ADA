@@ -1,3 +1,5 @@
+import time 
+
 def espectaculo_zoologico(n, m, k, animales, grandezas, apertura, partes):
     animales_grandezas = list(zip(animales, grandezas))
     
