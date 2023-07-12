@@ -73,10 +73,21 @@ def espectaculo_zoologico(n, m, k, animales, grandezas, apertura, partes):
     print("La escena de mayor grandeza total fue la escena", apertura_ordenada[-1])
     print("El promedio de grandeza de todo el espectáculo fue de", promedio_grandezas)
 
+# Función para medir el tiempo de ejecución de espectaculo_zoologico
+def medir_tiempo_espectaculo_zoologico(n, m, k, animales, grandezas, apertura, partes):
+    inicio = time.time()
+    espectaculo_zoologico(n, m, k, animales, grandezas, apertura, partes)
+    fin = time.time()
+    tiempo_total = fin - inicio
+    print("La función espectaculo_zoologico se ejecutó en", tiempo_total, "segundos")
+
 # Ejemplo de uso
+n = 6
+m = 3
+k = 2
 animales = ["gato", "libelula", "ciempies", "nutria", "perro", "tapir"]
 grandezas = [3, 2, 1, 6, 4, 5]
 apertura = [["gato", "ciempies", "libelula"], ["ciempies", "tapir", "gato"], ["tapir", "perro", "gato"], ["tapir", "nutria", "perro"]]
 partes = [[["ciempies", "tapir", "gato"], ["tapir", "nutria", "perro"]], [["gato", "ciempies", "libelula"], ["tapir", "perro", "gato"]]]
 
-espectaculo_zoologico(len(animales), 3, 2, animales, grandezas, apertura, partes)
+medir_tiempo_espectaculo_zoologico(n, m, k, animales, grandezas, apertura, partes)
