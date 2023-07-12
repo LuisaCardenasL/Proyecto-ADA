@@ -1,3 +1,12 @@
+'''
+    Solución con complejidad O(n*log(n)):
+    
+        Se utilizó el método de ordenamiento quicksort tanto 
+        para las escenas como los animales dentro de ellas ya 
+        que tiene un orden de crecimiento promedio de O(n log(n))
+'''
+
+
 class Animal:
     def __init__(self, nombre, grandeza):
         self.nombre = nombre
@@ -9,27 +18,54 @@ class Animal:
 
 class Escena:
     def __init__(self, animales):
-        self.animales = animales
-        self.grandeza_total = sum(animal.grandeza for animal in animales)
-        self.max_grandeza_individual = max(animal.grandeza for animal in animales)
+        self.animales = self.ordenar_animales_quicksort(animales)
+        self.grandeza_total = sum(animal.grandeza for animal in self.animales)
+        self.max_grandeza_individual = max(animal.grandeza for animal in self.animales)
 
     def __str__(self):
         return ", ".join(str(animal) for animal in self.animales)
 
+    def ordenar_animales_quicksort(self, animales):
+        if len(animales) <= 1:
+            return animales
+
+        pivote = animales[len(animales) // 2]
+        menores, iguales, mayores = [], [], []
+
+        for animal in animales:
+            if animal.grandeza < pivote.grandeza:
+                menores.append(animal)
+            elif animal.grandeza == pivote.grandeza:
+                iguales.append(animal)
+            else:
+                mayores.append(animal)
+
+        return (
+            self.ordenar_animales_quicksort(menores)
+            + iguales
+            + self.ordenar_animales_quicksort(mayores)
+        )
+
 
 class Espectaculo:
-    def __init__(self, n, m, k, animales, partes):
+    def __init__(self, n, m, k, animales, apertura, partes):
         self.n = n
         self.m = m
         self.k = k
         self.animales = animales
-        self.partes = partes
+        self.apertura = [
+            Escena([animal for animal in escena]) for escena in apertura
+        ]
+        self.partes = [
+            [
+                Escena([animal for animal in partida])
+                for partida in parte
+            ]
+            for parte in partes
+        ]
 
 
-    '''
-        Se utilizó el método de ordenamiento quicksort ya que tiene
-        un orden de crecimiento promedio de O(n log(n))
-    '''
+
     def ordenar_escenas_quicksort(self, escenas):
         if len(escenas) <= 1:
             return escenas
@@ -43,7 +79,10 @@ class Espectaculo:
             elif escena.grandeza_total == pivote.grandeza_total:
                 if escena.max_grandeza_individual < pivote.max_grandeza_individual:
                     menores.append(escena)
-                elif escena.max_grandeza_individual == pivote.max_grandeza_individual:
+                elif (
+                    escena.max_grandeza_individual
+                    == pivote.max_grandeza_individual
+                ):
                     iguales.append(escena)
                 else:
                     mayores.append(escena)
@@ -61,23 +100,21 @@ class Espectaculo:
             print(escena)
 
     def ejecutar_espectaculo(self):
-        todas_las_escenas = [Escena(partida) for partida in self.partes]
-        apertura = todas_las_escenas[: self.m * self.k]
-        partes_siguientes = todas_las_escenas[self.m * self.k :]
-
-        escenas_ordenadas_apertura = self.ordenar_escenas_quicksort(apertura)
-        escenas_ordenadas_partes = self.ordenar_escenas_quicksort(partes_siguientes)
+        apertura_ordenada = self.ordenar_escenas_quicksort(self.apertura)
+        partes_ordenadas = [
+            self.ordenar_escenas_quicksort(parte) for parte in self.partes
+        ]
 
         print("Apertura:")
-        self.mostrar_escenas(escenas_ordenadas_apertura)
+        self.mostrar_escenas(apertura_ordenada)
+        print()
 
-        for i, parte in enumerate(escenas_ordenadas_partes, 1):
+        for i, parte in enumerate(partes_ordenadas, 1):
             print(f"Parte {i}:")
-            self.mostrar_escenas([parte])
+            self.mostrar_escenas(parte)
+            print()
 
-        todas_las_escenas_ordenadas = (
-            escenas_ordenadas_apertura + escenas_ordenadas_partes
-        )
+        todas_las_escenas_ordenadas = apertura_ordenada + sum(partes_ordenadas, [])
         animales_escenas = [
             animal
             for escena in todas_las_escenas_ordenadas
@@ -112,51 +149,73 @@ class Espectaculo:
 
         print("\nResultados:")
         print(
-            f"El animal que participó en más escenas: {animal_mas_participante.nombre} ({max_participacion} escenas)"
+            f"El animal que participó en más escenas dentro del espectáculo fue {animal_mas_participante.nombre} que participó en {max_participacion} escenas."
         )
         print(
-            f"El animal que participó en menos escenas: {', '.join(str(animal) for animal in animales_menos_participantes)} ({min_participacion} escenas)"
+            f"El animal que menos participó en escenas dentro del espectáculo fueron {', '.join(animal.nombre for animal in animales_menos_participantes)} quienes participaron cada uno en {min_participacion} escenas."
         )
-        print(f"Escena de menor grandeza total: {escena_menor_grandeza_total}")
-        print(f"Escena de mayor grandeza total: {escena_mayor_grandeza_total}")
-        print(f"Promedio de grandeza de todo el espectáculo: {promedio_grandezas:.2f}")
+        print(
+            f"La escena de menor grandeza total fue la escena {escena_menor_grandeza_total}."
+        )
+        print(
+            f"La escena de mayor grandeza total fue la escena {escena_mayor_grandeza_total}."
+        )
+        print(
+            f"El promedio de grandeza de todo el espectáculo fue de {promedio_grandezas:.2f}."
+        )
 
 
 """
-    Ejemplo de uso 
+    Ejemplo de uso
 """
 
-# Creacion del espectaculo
+# Creación del espectáculo
 n = 9
 m = 4
 k = 3
 
-animales = [
-    Animal("Capibara", 1),
-    Animal("Loro", 2),
-    Animal("Caimán", 3),
-    Animal("Boa", 4),
-    Animal("Cocodrilo", 5),
-    Animal("Cebra", 6),
-    Animal("Pantera negra", 7),
-    Animal("Tigre", 8),
-    Animal("León", 9),
+animales = {
+    "Capibara": Animal("Capibara", 1),
+    "Loro": Animal("Loro", 2),
+    "Caimán": Animal("Caimán", 3),
+    "Boa": Animal("Boa", 4),
+    "Cocodrilo": Animal("Cocodrilo", 5),
+    "Cebra": Animal("Cebra", 6),
+    "Pantera negra": Animal("Pantera negra", 7),
+    "Tigre": Animal("Tigre", 8),
+    "León": Animal("León", 9),
+}
+
+
+capibara = animales["Capibara"]
+loro = animales["Loro"]
+caiman = animales["Caimán"]
+boa = animales["Boa"]
+cocodrilo = animales["Cocodrilo"]
+cebra = animales["Cebra"]
+pantera = animales["Pantera negra"]
+tigre = animales["Tigre"]
+leon = animales["León"]
+
+apertura = [
+    [caiman, capibara, loro],
+    [boa, caiman, capibara],
+    [cocodrilo, capibara, loro],
+    [pantera, cocodrilo, loro],
+    [tigre, loro, capibara],
+    [leon, caiman, loro],
+    [leon, cocodrilo, boa],
+    [leon, pantera, cebra],
+    [tigre, cebra, pantera],
 ]
 
 partes = [
-    [Animal("Caimán", 3), Animal("Capibara", 1), Animal("Loro", 2)],
-    [Animal("Boa", 4), Animal("Caimán", 3), Animal("Capibara", 1)],
-    [Animal("Cocodrilo", 5), Animal("Capibara", 1), Animal("Loro", 2)],
-    [Animal("Pantera negra", 7), Animal("Cocodrilo", 5), Animal("Loro", 2)],
-    [Animal("Tigre", 8), Animal("Loro", 2), Animal("Capibara", 1)],
-    [Animal("León", 9), Animal("Caimán", 3), Animal("Loro", 2)],
-    [Animal("León", 9), Animal("Cocodrilo", 5), Animal("Boa", 4)],
-    [Animal("León", 9), Animal("Pantera negra", 7), Animal("Cebra", 6)],
-    [Animal("Tigre", 8), Animal("Cebra", 6), Animal("Pantera negra", 7)],
+    [[caiman, capibara, loro], [tigre, loro, capibara], [tigre, cebra, pantera]],
+    [[pantera, cocodrilo, loro], [leon, pantera, cebra], [cocodrilo, capibara, loro]],
+    [[boa, caiman, capibara], [leon, caiman, loro], [leon, cocodrilo, boa]]
 ]
 
+espectaculo = Espectaculo(n, m, k, animales, apertura, partes)
 
-espectaculo = Espectaculo(n, m, k, animales, partes)
-
-# Ejecución del espectaculo
+# Ejecución del espectáculo
 espectaculo.ejecutar_espectaculo()
