@@ -1,3 +1,4 @@
+import time 
 '''
     Solución con complejidad O(n*log(n)):
     
@@ -163,6 +164,12 @@ class Espectaculo:
         print(
             f"El promedio de grandeza de todo el espectáculo fue de {promedio_grandezas:.2f}."
         )
+    def medir_tiempo(self):
+        inicio = time.time()
+        self.ejecutar_espectaculo()
+        fin = time.time()
+        tiempo_transcurrido = fin - inicio
+        print(f"Tiempo transcurrido: {tiempo_transcurrido} segundos.")
 
 
 """
@@ -218,4 +225,4 @@ partes = [
 espectaculo = Espectaculo(n, m, k, animales, apertura, partes)
 
 # Ejecución del espectáculo
-espectaculo.ejecutar_espectaculo()
+espectaculo.medir_tiempo()
